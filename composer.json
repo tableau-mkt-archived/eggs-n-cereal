@@ -1,0 +1,23 @@
+{
+  "name": "tableau-mkt/eggs-n-cereal",
+  "description": "A basic PHP XLIFF serialization library.",
+  "require": {
+    "psr/log": "~1.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "~4.4"
+  },
+  "autoload": {
+    "psr-4": {"EggsCereal\\": "src/"}
+  },
+  "license": "GPL-2.0+",
+  "authors": [{
+    "name": "Eric Peterson",
+    "email": "epeterson@tableausoftware.com"
+  }, {
+    "name": "Other Contributors",
+    "homepage": "https://github.com/tableau-mkt/eggs-n-cereal/graphs/contributors"
+  }],
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
