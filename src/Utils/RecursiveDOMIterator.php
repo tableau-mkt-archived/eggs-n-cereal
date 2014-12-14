@@ -32,7 +32,7 @@ class RecursiveDOMIterator implements \RecursiveIterator {
    * @param DOMNode $node
    *   A DOMNode to iterate over.
    */
-  public function __construct(DOMNode $node) {
+  public function __construct(\DOMNode $node) {
     $this->nodeList = $node->childNodes;
   }
 
