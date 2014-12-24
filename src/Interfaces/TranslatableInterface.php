@@ -38,8 +38,12 @@ interface TranslatableInterface {
    * TranslatableInterface::setData(). This may guide your implementation.
    *
    * @return array
-   *   A(n optionally) multidimensional array of translatable data associated
-   *   with this translatable.
+   *   A multidimensional array of translatable data associated with this
+   *   translatable. Each bit of translatable data should actually be an
+   *   associative array consisting of at least the following:
+   *   - #label: A string representing what the translatable text represents.
+   *     This may be parsed and displayed as a note for translators.
+   *   - #text: The actual text that should be translated.
    *
    * @see EggsCereal\Serializer::exportTranslatable()
    * @see TranslatableInterface::setData()
