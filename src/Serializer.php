@@ -116,7 +116,7 @@ class Serializer extends \XMLWriter implements LoggerAwareInterface {
     // Root element with schema definition.
     $this->startElement('xliff');
     $this->writeAttribute('version', '1.2');
-    $this->writeAttribute('xmlns', 'urn:oasis:names:tc:xliff:document:1.2');
+    $this->writeAttribute('xmlns:xlf', 'urn:oasis:names:tc:xliff:document:1.2');
     $this->writeAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
     $this->writeAttribute('xmlns:html', 'http://www.w3.org/1999/xhtml');
     $this->writeAttribute('xsi:schemaLocation', 'urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-strict.xsd');
@@ -167,7 +167,7 @@ class Serializer extends \XMLWriter implements LoggerAwareInterface {
     $this->setIndent(TRUE);
     $this->setIndentString(' ');
 
-    $this->startElement('group');
+    $this->startElement('xlf:group');
     $this->writeAttribute('id', $translatable->getIdentifier());
     $this->writeAttribute('restype', 'x-eggs-n-cereal-translatable');
 
@@ -203,7 +203,7 @@ class Serializer extends \XMLWriter implements LoggerAwareInterface {
    *   The generated XML.
    */
   protected function addTransUnit($key, $element, $targetLang) {
-    $this->startElement('group');
+    $this->startElement('xlf:group');
     $this->writeAttribute('id', $key);
     $this->writeAttribute('resname', $key);
     $this->writeAttribute('restype', 'x-eggs-n-cereal-field');
@@ -267,11 +267,10 @@ class Serializer extends \XMLWriter implements LoggerAwareInterface {
     // https://bugs.php.net/bug.php?id=61469
     $xml = $this->serializerSimplexmlLoadString($xmlString);
 
-    // Register the xliff namespace, required for xpath.
-    $xml->registerXPathNamespace('xliff', 'urn:oasis:names:tc:xliff:document:1.2');
+    // Register the html namespace, required for xpath.
     $xml->registerXPathNamespace('html', 'http://www.w3.org/1999/xhtml');
 
-    $translatables = $xml->xpath('//xliff:group[@restype="x-eggs-n-cereal-translatable"]');
+    $translatables = $xml->xpath('//xlf:group[@restype="x-eggs-n-cereal-translatable"]');
     if (empty($translatables)) {
       return $this->oldImport($xml);
     }
@@ -303,12 +302,8 @@ class Serializer extends \XMLWriter implements LoggerAwareInterface {
    *   The resultant unserialized, flattened data array.
    */
   public function oldImport(\SimpleXMLElement $xml) {
-
-    // Register the xliff namespace, required for xpath.
-    $xml->registerXPathNamespace('xliff', 'urn:oasis:names:tc:xliff:document:1.2');
-
     $data = array();
-    foreach ($xml->xpath('//xliff:trans-unit') as $unit) {
+    foreach ($xml->xpath('//trans-unit') as $unit) {
       $data[(string) $unit['id']]['#text'] = (string) $unit->target;
     }
     return Data::unflattenData($data);
@@ -363,9 +358,6 @@ class Serializer extends \XMLWriter implements LoggerAwareInterface {
       return FALSE;
     }
 
-    // Register the xliff namespace, required for xpath.
-    $xml->registerXPathNamespace('xliff', 'urn:oasis:names:tc:xliff:document:1.2');
-
     $errorArgs = array(
       '%lang' => $targetLang,
       '%name' => $translatable->getLabel(),
@@ -373,7 +365,7 @@ class Serializer extends \XMLWriter implements LoggerAwareInterface {
     );
 
     // Check if our phase information is there.
-    $phase = $xml->xpath("//xliff:phase[@phase-name='extraction']");
+    $phase = $xml->xpath("//phase[@phase-name='extraction']");
     if ($phase) {
       $phase = reset($phase);
     }
