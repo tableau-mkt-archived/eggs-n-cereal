@@ -328,7 +328,7 @@ class Converter implements LoggerAwareInterface {
   protected function convertElementTag(\DOMElement $element) {
 
     if ($this->isBlockElement($element) && $this->hasBlockChild($element)) {
-      return $this->doc->createElement('group');
+      return $this->doc->createElement('xlf:group');
     }
     if (isset($this->selfClosingTags[$element->tagName]) && $this->inTransUnit) {
       $out = $this->doc->createElement('x');
