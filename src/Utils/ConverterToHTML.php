@@ -15,7 +15,7 @@ class ConverterToHTML extends Converter {
 
     // Setting meta below is a hack to get our DomDocument into utf-8. All other
     // methods tried didn't work.
-    $success = $this->doc->loadXML('<xliff version="1.2" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xlf="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-strict.xsd">' . $xml . '</xliff>');
+    $success = $this->doc->loadXML('<xliff version="1.2" xmlns:html="http://www.w3.org/1999/xhtml" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-strict.xsd">' . $xml . '</xliff>');
     $this->errorStop($error);
     $this->elementMap = array_flip($this->elementMap);
 
@@ -25,7 +25,6 @@ class ConverterToHTML extends Converter {
 
     $this->xpath = new \DOMXPath($this->doc);
     $this->xpath->registerNamespace('html', 'http://www.w3.org/1999/xhtml');
-    $this->xpath->registerNamespace('xliff', 'urn:oasis:names:tc:xliff:document:1.2');
   }
 
   /**
@@ -38,7 +37,7 @@ class ConverterToHTML extends Converter {
 
     $this->out = new \DOMDocument('1.0', 'UTF-8');
     $this->out->formatOutput = $pretty_print;
-    $field = $this->doc->getElementsByTagName('group')->item(0);
+    $field = $this->doc->getElementsByTagName('xlf:group')->item(0);
 
     foreach ($field->childNodes as $child) {
       if ($output = $this->convert($child)) {
@@ -53,7 +52,7 @@ class ConverterToHTML extends Converter {
 
     if ($node->nodeType == XML_ELEMENT_NODE) {
       switch ($node->tagName) {
-        case 'group':
+        case 'xlf:group':
           return $this->convertGroup($node);
 
         case 'trans-unit':
@@ -84,7 +83,7 @@ class ConverterToHTML extends Converter {
 
   protected function htmlTag(\DOMElement $element) {
     switch ($element->tagName) {
-      case 'group':
+      case 'xlf:group':
       case 'trans-unit':
         $attr = $element->getAttribute('restype');
         break;
