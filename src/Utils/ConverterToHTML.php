@@ -40,9 +40,13 @@ class ConverterToHTML extends Converter {
     $field = $this->doc->getElementsByTagName('xlf:group')->item(0);
 
     foreach ($field->childNodes as $child) {
-      if ($output = $this->convert($child)) {
-        $this->out->appendChild($output);
+      $output = $this->convert($child);
+
+      if ( ! $output || empty($output->textContent)) {
+        continue;
       }
+
+      $this->out->appendChild($output);
     }
 
     return html_entity_decode($this->out->saveHTML(), ENT_QUOTES, 'UTF-8');
@@ -121,9 +125,15 @@ class ConverterToHTML extends Converter {
   protected function convertTransUnit(\DOMElement $node) {
     $elem = $this->htmlTag($node);
     $target = $node->getElementsByTagName('target')->item(0);
+
+    if ( ! $target) {
+      return $elem;
+    }
+
     foreach ($target->childNodes as $child) {
       $elem->appendChild($this->convertTarget($child));
     }
+
     return $elem;
   }
 

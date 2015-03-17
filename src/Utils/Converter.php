@@ -29,6 +29,13 @@ class Converter implements LoggerAwareInterface {
    */
   private $logger = NULL;
 
+  /**
+   * Include a target or not
+   *
+   * @var boolean
+   */
+  private $includeTarget = true;
+
   protected $elementMap = array(
     'b' => 'bold',
     'br' => 'lb',
@@ -137,10 +144,11 @@ class Converter implements LoggerAwareInterface {
 
   protected $inTransUnit = FALSE;
 
-  public function __construct($html, $langcode) {
+  public function __construct($html, $langcode, $includeTarget = true) {
     $this->doc = new \DOMDocument();
     $this->doc->strictErrorChecking = FALSE;
     $this->langcode = $langcode;
+    $this->includeTarget = $includeTarget;
     $error = $this->errorStart();
 
     // Setting meta below is a hack to get our DomDocument into utf-8. All other
@@ -316,7 +324,9 @@ class Converter implements LoggerAwareInterface {
       $source = $this->createSource('en');
       $target = $this->createTarget('fr');
       $trans->appendChild($source);
-      $trans->appendChild($target);
+      if ($this->includeTarget) {
+        $trans->appendChild($target);
+      }
       $source->appendChild($text);
       $target->appendChild(clone $text);
       return $trans;
