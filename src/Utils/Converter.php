@@ -290,8 +290,10 @@ class Converter implements LoggerAwareInterface {
     if ($translated_element->tagName == 'trans-unit') {
       $out = $this->createSource();
       $translated_element->appendChild($out);
-      $target = $this->createTarget();
-      $translated_element->appendChild($target);
+      if ($this->includeTarget) {
+        $target = $this->createTarget();
+        $translated_element->appendChild($target);
+      }
       $this->inTransUnit = TRUE;
     }
     else {
@@ -302,7 +304,7 @@ class Converter implements LoggerAwareInterface {
       foreach ($element->childNodes as $child) {
         if ($converted = $this->convert(clone $child)) {
           $out->appendChild($converted);
-          if ($out->tagName == 'source') {
+          if ($out->tagName == 'source' && $this->includeTarget) {
             $target->appendChild(clone $converted);
           }
         }
@@ -329,6 +331,7 @@ class Converter implements LoggerAwareInterface {
       }
       $source->appendChild($text);
       $target->appendChild(clone $text);
+
       return $trans;
     }
 
