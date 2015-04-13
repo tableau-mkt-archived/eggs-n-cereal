@@ -278,12 +278,16 @@ class Serializer extends \XMLWriter implements LoggerAwareInterface {
     $data = array();
     foreach ($translatables as $translatable) {
       foreach ($translatable->xpath('//*[@restype="x-eggs-n-cereal-field"]') as $field) {
+        $id = (string) $field['id'];
+        if (isset($field->note)) {
+          $data[$id]['#label'] = (string) $field->note;
+        }
         if ($field->{'trans-unit'}->attributes()->restype == 'x-eggs-n-cereal-failure') {
-          $data[(string) $field['id']]['#text'] = (string) $field->{'trans-unit'}->target;
+          $data[$id]['#text'] = (string) $field->{'trans-unit'}->target;
         }
         else {
           $converter = new ConverterToHTML($field->saveXML());
-          $data[(string) $field['id']]['#text'] = $converter->toHTML();
+          $data[$id]['#text'] = $converter->toHTML();
         }
       }
     }
