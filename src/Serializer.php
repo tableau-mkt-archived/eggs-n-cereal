@@ -26,10 +26,26 @@ class Serializer extends \XMLWriter implements LoggerAwareInterface {
   private $logger = NULL;
 
   /**
+   * Include a target or not
+   *
+   * @var boolean
+   */
+  private $includeTarget = true;
+
+  /**
    * {@inheritdoc}
    */
   public function setLogger(LoggerInterface $logger) {
     $this->logger = $logger;
+  }
+
+  /**
+   * Enable or Disable the inclusion of a target field
+   *
+   * @return  null
+   */
+  public function excludeTargets() {
+    $this->includeTarget = false;
   }
 
   /**
@@ -217,7 +233,7 @@ class Serializer extends \XMLWriter implements LoggerAwareInterface {
     $element['#text'] = strtr($element['#text'], $namedTable);
 
     try {
-      $converter = new Converter($element['#text'], $targetLang);
+      $converter = new Converter($element['#text'], $targetLang, $this->includeTarget);
       if ($this->logger) {
         $converter->setLogger($this->logger);
       }
@@ -232,11 +248,13 @@ class Serializer extends \XMLWriter implements LoggerAwareInterface {
       $this->text($element['#text']);
       $this->endElement();
 
-      $this->startElement('target');
-      $this->writeAttribute('xml:lang', $targetLang);
-      $this->text($element['#text']);
-      $this->endElement();
-      $this->endElement();
+      if ($this->includeTarget) {
+        $this->startElement('target');
+        $this->writeAttribute('xml:lang', $targetLang);
+        $this->text($element['#text']);
+        $this->endElement();
+        $this->endElement();
+      }
     }
     if (isset($element['#label'])) {
       $this->writeElement('note', $element['#label']);
