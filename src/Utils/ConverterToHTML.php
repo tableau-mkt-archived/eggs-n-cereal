@@ -53,6 +53,7 @@ class ConverterToHTML extends Converter {
     if ($node->nodeType == XML_ELEMENT_NODE) {
       switch ($node->tagName) {
         case 'xlf:group':
+        case 'group':
           return $this->convertGroup($node);
 
         case 'trans-unit':
@@ -84,6 +85,7 @@ class ConverterToHTML extends Converter {
   protected function htmlTag(\DOMElement $element) {
     switch ($element->tagName) {
       case 'xlf:group':
+      case 'group':
       case 'trans-unit':
         $attr = $element->getAttribute('restype');
         break;
