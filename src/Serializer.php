@@ -26,6 +26,27 @@ class Serializer extends \XMLWriter implements LoggerAwareInterface {
   private $logger = NULL;
 
   /**
+   * Language code representing document source language; conforms to RFC 4646
+   * language code.
+   *
+   * @var string
+   */
+  private $sourceLang;
+
+  /**
+   * Initializes this Serializer.
+   *
+   * @param string $sourceLanguage
+   *   (Optional) The language code to be used as the <source> language when
+   *   serializing data or validating data during unserialization. The code
+   *   should conform to language codes as described in RFC 4646 (e.g. "en" or
+   *   "en-US").
+   */
+  public function __construct($sourceLanguage = 'en') {
+    $this->sourceLang = $sourceLanguage;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function setLogger(LoggerInterface $logger) {
@@ -124,7 +145,7 @@ class Serializer extends \XMLWriter implements LoggerAwareInterface {
     // File element.
     $this->startElement('file');
     $this->writeAttribute('original', 'xliff-core-1.2-strict.xsd');
-    $this->writeAttribute('source-language', 'en');
+    $this->writeAttribute('source-language', $this->sourceLang);
     $this->writeAttribute('target-language', $targetLang);
     $this->writeAttribute('datatype', 'plaintext');
 
@@ -217,7 +238,7 @@ class Serializer extends \XMLWriter implements LoggerAwareInterface {
     $element['#text'] = strtr($element['#text'], $namedTable);
 
     try {
-      $converter = new Converter($element['#text'], $targetLang);
+      $converter = new Converter($element['#text'], $this->sourceLang, $targetLang);
       if ($this->logger) {
         $converter->setLogger($this->logger);
       }
@@ -228,7 +249,7 @@ class Serializer extends \XMLWriter implements LoggerAwareInterface {
       $this->writeAttribute('id', uniqid('text-'));
       $this->writeAttribute('restype', 'x-eggs-n-cereal-failure');
       $this->startElement('source');
-      $this->writeAttribute('xml:lang', 'en');
+      $this->writeAttribute('xml:lang', $this->sourceLang);
       $this->text($element['#text']);
       $this->endElement();
 
@@ -364,6 +385,7 @@ class Serializer extends \XMLWriter implements LoggerAwareInterface {
 
     $errorArgs = array(
       '%lang' => $targetLang,
+      '%srclang' => $this->sourceLang,
       '%name' => $translatable->getLabel(),
       '%id' => $translatable->getIdentifier(),
     );
@@ -393,8 +415,8 @@ class Serializer extends \XMLWriter implements LoggerAwareInterface {
       $this->log(LogLevel::ERROR, 'The source language is missing in the XML.', $errorArgs);
       return FALSE;
     }
-    elseif ($xml->file['source-language'] != 'en') {
-      $this->log(LogLevel::ERROR, 'The source language is invalid in the XML. Correct langcode: en.', $errorArgs);
+    elseif ($xml->file['source-language'] != $this->sourceLang) {
+      $this->log(LogLevel::ERROR, 'The source language is invalid in the XML. Correct langcode: %srclang.', $errorArgs);
       return FALSE;
     }
 

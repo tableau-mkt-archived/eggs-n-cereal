@@ -25,6 +25,22 @@ class Converter implements LoggerAwareInterface {
   protected $out;
 
   /**
+   * Language code representing HTML source language; conforms to RFC 4646
+   * language code.
+   *
+   * @var string
+   */
+  protected $sourceLang;
+
+  /**
+   * Language code representing HTML target language; conforms to RFC 4646
+   * language code.
+   *
+   * @var string
+   */
+  protected $targetLang;
+
+  /**
    * @var LoggerInterface
    */
   private $logger = NULL;
@@ -137,10 +153,11 @@ class Converter implements LoggerAwareInterface {
 
   protected $inTransUnit = FALSE;
 
-  public function __construct($html, $langcode) {
+  public function __construct($html, $sourceLang, $targetLang) {
     $this->doc = new \DOMDocument();
     $this->doc->strictErrorChecking = FALSE;
-    $this->langcode = $langcode;
+    $this->sourceLang = $sourceLang;
+    $this->targetLang = $targetLang;
     $error = $this->errorStart();
 
     // Setting meta below is a hack to get our DomDocument into utf-8. All other
@@ -313,8 +330,8 @@ class Converter implements LoggerAwareInterface {
     if (!$this->inTransUnit) {
       $trans = $this->doc->createElement('trans-unit');
       $trans->setAttribute('id', uniqid('text-'));
-      $source = $this->createSource('en');
-      $target = $this->createTarget('fr');
+      $source = $this->createSource($this->sourceLang);
+      $target = $this->createTarget($this->targetLang);
       $trans->appendChild($source);
       $trans->appendChild($target);
       $source->appendChild($text);
@@ -391,13 +408,13 @@ class Converter implements LoggerAwareInterface {
 
   protected function createSource() {
     $element = $this->doc->createElement('source');
-    $element->setAttribute('xml:lang', 'en');
+    $element->setAttribute('xml:lang', $this->sourceLang);
     return $element;
   }
 
   protected function createTarget() {
     $element = $this->doc->createElement('target');
-    $element->setAttribute('xml:lang', $this->langcode);
+    $element->setAttribute('xml:lang', $this->targetLang);
     return $element;
   }
 
