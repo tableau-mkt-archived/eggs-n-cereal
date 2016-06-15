@@ -347,7 +347,8 @@ class Serializer extends \XMLWriter implements LoggerAwareInterface {
     $numericTable = array();
     //commonly present restricted characters that can safely be replaced
     $numericTable['&'] = '&#38;';
-    $trans = get_html_translation_table(HTML_ENTITIES, ENT_QUOTES);
+    $entBitmask = defined('ENT_HTML5') ? ENT_QUOTES | ENT_HTML5 : ENT_QUOTES;
+    $trans = get_html_translation_table(HTML_ENTITIES, $entBitmask);
     foreach ($trans as $k=>$v){
       $numericTable[$v]= "&#".ord($k).";";
     }
