@@ -72,7 +72,7 @@ class Converter implements LoggerAwareInterface {
     'address' => TRUE,
     'applet' => TRUE,
     'area' => TRUE,
-    'audio' => TRUE,
+    // 'audio' => TRUE,
     'b' => TRUE,
     'bdo' => TRUE,
     'big' => TRUE,
@@ -102,7 +102,7 @@ class Converter implements LoggerAwareInterface {
     'map' => TRUE,
     'mark' => TRUE,
     'meter' => TRUE,
-    'nav' => TRUE,
+    // 'nav' => TRUE,
     'nobr' => TRUE,
     'object' => TRUE,
     'optgroup' => TRUE,
@@ -347,6 +347,9 @@ class Converter implements LoggerAwareInterface {
     if ($this->isBlockElement($element) && $this->hasBlockChild($element)) {
       return $this->doc->createElement('xlf:group');
     }
+    elseif (isset($this->inlineTags[$element->tagName]) && $this->hasBlockChild($element)) {
+      return $this->doc->createElement('xlf:group');
+    }
     if (isset($this->selfClosingTags[$element->tagName]) && $this->inTransUnit) {
       $out = $this->doc->createElement('x');
     }
@@ -383,7 +386,7 @@ class Converter implements LoggerAwareInterface {
   protected function xliffAttrs(\DOMElement $element) {
     $attrs = array();
 
-    if (isset($this->inlineTags[$element->tagName])) {
+    if (isset($this->inlineTags[$element->tagName]) && !$this->hasBlockChild($element)) {
       $attrs[] = new \DOMAttr('ctype', $this->mapHTMLTagToXLIFF($element));
     }
     else if($element->tagName != 'text'){
