@@ -72,7 +72,7 @@ class Converter implements LoggerAwareInterface {
     'address' => TRUE,
     'applet' => TRUE,
     'area' => TRUE,
-    // 'audio' => TRUE,
+    'audio' => TRUE,
     'b' => TRUE,
     'bdo' => TRUE,
     'big' => TRUE,
