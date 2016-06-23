@@ -269,9 +269,9 @@ class Converter implements LoggerAwareInterface {
 
         return $this->addText($node);
 
-      // case XML_CDATA_SECTION_NODE:
-      //   $out->appendChild($this->addText($node));
-      //   return $out;
+      case XML_CDATA_SECTION_NODE:
+        $elem = new \DOMText($node->textContent);
+        return $this->addText($elem);
 
     }
 
@@ -358,6 +358,11 @@ class Converter implements LoggerAwareInterface {
     }
     else {
       $out = $this->doc->createElement('trans-unit');
+
+      // For simplicity, set some elements to disallow translation.
+      if (in_array($element->tagName, array('style', 'script'))) {
+        $out->setAttribute('translate', 'no');
+      }
     }
     $out->setAttribute('id', uniqid($element->tagName . '-'));
     return $out;
